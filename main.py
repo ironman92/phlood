@@ -37,7 +37,7 @@ while True:
 	command = input("\n\n===================\nAvailable Commands:\n" +
 					"\tExit\tStops all threads and exits program\n" +
 					"\tStatus\tDisplays quick status\n"
-					">>").split()
+					">").split()
 	if len(command) == 0:
 		continue
 	if command[0].strip().lower() == 'exit':
