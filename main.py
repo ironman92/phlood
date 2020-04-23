@@ -34,16 +34,27 @@ proxy.start()
 
 
 while True:
-	command = input("\n\n===================\nAvailable Commands:\n" +
-					"\tExit\tStops all threads and exits program\n" +
-					"\tStatus\tDisplays quick status\n"
-					">").split()
+	raw_command = input("\n>")
+	command = raw_command.split()
+	for i in range(len(command)):
+		command[i] = command[i].strip().lower()
 	if len(command) == 0:
 		continue
-	if command[0].strip().lower() == 'exit':
+	if command[0] == 'exit':
 		break
-	if command[0].strip().lower() == 'status':
-		print("Proxies: " + str(len(proxy.list)))
+	if command[0] == 'help':
+		print(	"Available Commands:\n" +
+				"===================\n" +
+				"Help\tDisplay this help text\n" +
+				"Status\tDisplays quick status\n" +
+				"Exit\tStops all threads and exits program\n")
+		continue
+	if command[0] == 'status':
+		print("Status")
+		print("\tIP: " + proxy.my_ip)
+		print("\tProxies: " + str(len(proxy.list)))
+		continue
+	print("Unknown command: " + command)
 
 
 
