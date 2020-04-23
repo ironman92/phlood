@@ -43,10 +43,13 @@ class proxy_list(threading.Thread):
 					address = ''
 					if source['protocol']:
 						if source['protocol_dictionary']:
-							address = address + protocol_dictionary[record.select_one(source['protocol'])]
+							if record.select_one(source['protocol']).text not in source['protocol_dictionary']:
+								print("Unknown protocol: " + record.select_one(source['protocol']).text)
+								continue
+							address = address + source['protocol_dictionary'][record.select_one(source['protocol']).text]
 						else:
-							address = address + record.select_one(source['protocol'])
-					address = address + record.select_one(source['ip'])
+							address = address + record.select_one(source['protocol']).text
+					address = address + record.select_one(source['ip']).text
 					if source['port']:
 						address = address + ':' + record.select_one(source['port']).text
 					with self.lock:
