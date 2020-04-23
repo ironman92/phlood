@@ -2,7 +2,7 @@ import threading
 from bs4 import BeautifulSoup
 import random
 import urllib3
-#import json
+import json
 import time
 
 
@@ -28,9 +28,8 @@ class proxy_list(threading.Thread):
 
 	def update_my_ip(self):
 		http = urllib3.PoolManager(num_pools=1)
-		self.my_ip = http.request('GET', 'http://httpbin.org/ip').data
+		self.my_ip = json.loads(http.request('GET', 'http://httpbin.org/ip').data)['origin']
 		self.my_ip_updated = time.time()
-		print("UPDATED IP: " + str(self.my_ip))
 
 	def test_proxy(self, address):
 		if self.my_ip_updated + 60 < time.time():
@@ -38,7 +37,7 @@ class proxy_list(threading.Thread):
 		proxy_valid = False
 		try:
 			proxy = urllib3.ProxyManager(address, num_pools=1)
-			proxy_info = proxy.request('GET', 'http://httpbin.org/ip')
+			proxy_info = json.loads(proxy.request('GET', 'http://httpbin.org/ip'))['origin']
 			if proxy_info.status == 200 and proxy_info.data != self.my_ip:
 				proxy_valid = True
 		except:
