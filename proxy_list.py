@@ -11,6 +11,7 @@ class proxy_list:
 	def __init__(self):
 		threading.Thread.__init__(self)
 		self.list_lock = threading.RLock()
+		self.source_lock = threading.RLock()
 		self.stop_execution = True
 		self.list = []
 		self.sources = []
@@ -105,7 +106,7 @@ class proxy_list:
 			'protocol':				protocol,
 			'protocol_dictionary':	protocol_dictionary
 		}
-		with self.list_lock:
+		with self.source_lock:
 			if source in self.sources:
 				return False
 			self.sources.append(source)
