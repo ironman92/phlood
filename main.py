@@ -92,14 +92,47 @@ while True:
 	if command[0] == 'help':
 		print(	"Available Commands:\n" +
 				"===================\n" +
-				"Help\tDisplay this help text\n" +
-				"Status\tDisplays quick status\n" +
-				"Exit\tStops all threads and exits program\n")
+				"Help	Display this help text\n" +
+				"Status	Displays quick status\n" +
+				"Source	Manage proxy sources\n" +
+				"Exit	Stops all threads and exits program\n")
 		continue
 	if command[0] == 'status':
 		print("Status")
 		print("\tIP: " + proxy.my_ip)
 		print("\tProxies: " + str(len(proxy.list)))
+		print("\tProxy Sources: " + str(len(proxy.sources)))
+		continue
+	if command[0] == 'source':
+		if len(command) < 2 or command[1] == 'help':
+			print(	"Source Information\n" +
+					"Options===========\n" +
+					"Help	Display this help text\n" +
+					"List	Lists all options\n" +
+					"Add	Add source ( interactive )\n" +
+					"Drop	Remove source")
+			continue
+		if command[1] == 'list':
+			for source in proxy.sources:
+				print(source['url'])
+		if command[1] == 'add':
+			url					= input("URL: ").strip()
+			record				= input("CSS Record Selector: ").strip()
+			ip					= input("                 IP: ").strip()
+			port				= input("               Port: ").strip()
+			protocol			= input("           Protocol: ").strip()
+			protocol_dictionary = {}
+			while True:
+				protocol_lookup = input("Protocol Interpretation: ").strip()
+				if not protocol_lookup:
+					break
+				p = protocol_lookup.split()
+				if len(p) != 2:
+					continue
+				protocol_dictionary[p[0]] = p[1]
+			confirm = input("Confirm Add of above information [Yes|No]: ")
+			if len(confirm) > 0 and confirm[0].lower() == 'y':
+				proxy.add_source(url, record, ip, port, protocol, protocol_dictionary)
 		continue
 	print("Unknown command: " + command[0])
 
