@@ -96,7 +96,7 @@ class proxy_list:
 						address = address + ':' + record.select_one(source['port']).text
 					self.test_proxy(address)
 
-	def add_source(self, url, record, ip, port=None, protocol=None, protocol_dictionary=None):
+	def add_source(self, url, record, ip, port='', protocol='', protocol_dictionary={}):
 		source = {
 			'url':					url,
 			'record':				record,
