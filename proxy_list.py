@@ -117,6 +117,12 @@ class proxy_list:
 			self.sources.append(source)
 			return True
 
+	def remove_source(self, url):
+		with self.source_lock:
+			for source in self.sources:
+				if source['url'] == url:
+					self.sources.remove(source)
+
 	def random(self):
 		with self.list_lock:
 			if len(self.list) == 0:
