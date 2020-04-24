@@ -40,8 +40,8 @@ class proxy_list:
 		proxy_valid = False
 		try:
 			proxy = urllib3.ProxyManager(address, num_pools=1)
-			proxy_info = json.loads(proxy.request('GET', 'http://httpbin.org/ip'))['origin']
-			if proxy_info.status == 200 and proxy_info.data != self.my_ip:
+			proxy_info = proxy.request('GET', 'http://httpbin.org/ip')
+			if proxy_info.status == 200 and json.loads(proxy_info.data)['origin'] != self.my_ip:
 				proxy_valid = True
 		except:
 			proxy_valid = False
