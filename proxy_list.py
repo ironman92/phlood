@@ -7,7 +7,7 @@ import time
 
 
 
-class proxy_list(threading.Thread):
+class proxy_list:
 	def __init__(self):
 		threading.Thread.__init__(self)
 		self.list_lock = threading.RLock()
@@ -16,15 +16,17 @@ class proxy_list(threading.Thread):
 		self.sources = []
 		self.update_my_ip()
 		self.clean_list_thread = threading.Thread(target=self.run_clean_list)
+		self.proxy_add_thread = threading.Thread(target=self.run_proxy_add)
 
 	def start(self):
 		self.stop_execution = False
-		threading.Thread.start(self)
+		self.proxy_add_thread.start()
 		self.clean_list_thread.start()
 
 	def stop(self):
 		self.stop_execution = True
-		self.join()
+		self.clean_list_thread.join()
+		self.proxy_add_thread.join()
 
 	def update_my_ip(self):
 		http = urllib3.PoolManager(num_pools=1)
@@ -64,7 +66,7 @@ class proxy_list(threading.Thread):
 			if self.test_proxy(record):
 				index = index + 1
 
-	def run(self):
+	def run_proxy_add(self):
 		http = urllib3.PoolManager(num_pools=1)
 		while not self.stop_execution:
 			time.sleep(0)
