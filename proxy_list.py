@@ -69,33 +69,38 @@ class proxy_list:
 
 	def run_proxy_add(self):
 		http = urllib3.PoolManager(num_pools=1)
+		index = 0
 		while not self.stop_execution:
-			time.sleep(0)
-			for source in self.sources:
+			time.sleep(0.01)
+			with self.source_lock:
+				if index >= len(self.sources):
+					index = 0
+					continue
+				source = self.sources[index]
+			index = index + 1
+			r = http.request('GET', source['url'])
+			if r.status != 200:
+				self.remove_source(source['url'])
+				continue
+			page = BeautifulSoup(r.data, 'html.parser')
+			acknowledged_unknown_protocols = []
+			for record in page.select(source['record']):
 				if self.stop_execution:
 					break
 				time.sleep(0)
-				r = http.request('GET', source['url'])
-				if r.status != 200:
-					continue
-				page = BeautifulSoup(r.data, 'html.parser')
-				for record in page.select(source['record']):
-					if self.stop_execution:
-						break
-					time.sleep(0)
-					address = ''
-					if source['protocol']:
-						if source['protocol_dictionary']:
-							if record.select_one(source['protocol']).text not in source['protocol_dictionary']:
-								print("Unknown protocol: " + record.select_one(source['protocol']).text)
-								continue
-							address = address + source['protocol_dictionary'][record.select_one(source['protocol']).text]
-						else:
-							address = address + record.select_one(source['protocol']).text
-					address = address + record.select_one(source['ip']).text
-					if source['port']:
-						address = address + ':' + record.select_one(source['port']).text
-					self.test_proxy(address)
+				address = ''
+				if source['protocol']:
+					if source['protocol_dictionary']:
+						if record.select_one(source['protocol']).text not in source['protocol_dictionary']:
+							self.remove_source(source['url'])
+							break
+						address = address + source['protocol_dictionary'][record.select_one(source['protocol']).text]
+					else:
+						address = address + record.select_one(source['protocol']).text
+				address = address + record.select_one(source['ip']).text
+				if source['port']:
+					address = address + ':' + record.select_one(source['port']).text
+				self.test_proxy(address)
 
 	def add_source(self, url, record, ip, port='', protocol='', protocol_dictionary={}):
 		source = {
