@@ -47,38 +47,6 @@ with open('domains.txt', 'r') as domain_list:
 
 
 
-def generate_credentials():
-	domain = random.choice(domains)
-	choices = [
-		domain,
-		random.choice(domains),
-		random.choice(names),
-		random.choice(names),
-		random.choice(names),
-		random.choice(names),
-		random.choice(passwords)
-	]
-	email = ''
-	while len(email) < 6: # TODO : further validation
-		email = ''
-		while random.randint(0, 2):
-			choice = random.choice(choices)
-			start = random.randint(0, len(choice))
-			stop = random.randint(start, len(choice))
-			email = email + choice[start:stop]
-	email = email.lower() + '@' + domain.lower()
-	password = ''
-	while len(password) < 8: # TODO : further validation
-		password = ''
-		while random.randint(0, 4):
-			choice = random.choice(choices)
-			start = random.randint(0, len(choice))
-			stop = random.randint(start, len(choice))
-			password = password + choice[start:stop]
-	return (email, password)
-
-
-
 print("Ready")
 while True:
 	raw_command = input("\n>")
