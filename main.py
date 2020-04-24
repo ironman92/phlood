@@ -1,3 +1,7 @@
+print("Loading...")
+
+
+
 # Version Check
 from platform import python_version
 if python_version()[0] != '3':
@@ -33,6 +37,7 @@ proxy.start()
 
 
 
+print("Ready")
 while True:
 	raw_command = input("\n>")
 	command = raw_command.split()
