@@ -101,7 +101,7 @@ while True:
 		print("\tIP: " + proxy.my_ip)
 		print("\tProxies: " + str(len(proxy.list)))
 		continue
-	print("Unknown command: " + command)
+	print("Unknown command: " + command[0])
 
 
 
