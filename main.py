@@ -110,6 +110,58 @@ while True:
 			continue
 		print("Unknown command: " + command[1])
 		continue
+	if command[0] == 'proxy':
+		if len(command) < 2 or command[1] == 'help':
+			print(	"Proxy Help         Display this help text\n" +
+					"Proxy List type    List proxies. Substitute type for Potential or Active\n" +
+					"Proxy Drop url     Drop proxy with given address\n" +
+					"Proxy Add url      Add potential proxy with given address\n" +
+					"Proxy Purge        Purge all proxies")
+			continue
+		if command[1] == 'list':
+			if len(command) < 3:
+				print("Missing type")
+				continue
+			if command[2] == 'potential':
+				with proxy.potential_proxy_list_lock:
+					for prox in proxy.potential_proxy_list:
+						print(prox)
+				continue
+			if command[2] == 'active':
+				with proxy.active_proxy_list_lock:
+					for prox in proxy.active_proxy_list:
+						print(prox)
+				continue
+			print("Unknown type: " + command[2])
+			continue
+		if command[1] == 'add':
+			if len(command) < 3:
+				print("Missing url")
+				continue
+			with proxy.potential_proxy_list_lock:
+				if command[2] not in proxy.potential_proxy_list:
+					proxy.potential_proxy_list.append(command[2])
+			continue
+		if command[1] == 'drop':
+			if len(command) < 3:
+				print("Missing url")
+				continue
+			with proxy.potential_proxy_list_lock:
+				if command[2] in proxy.potential_proxy_list:
+					proxy.potential_proxy_list.remove(command[2])
+					with proxy.active_proxy_list_lock:
+						if command[2] in proxy.active_proxy_list:
+							proxy.active_proxy_list.remove(command[2])
+				else:
+					print("Proxy does not exist")
+			continue
+		if command[1] == 'purge':
+			with proxy.potential_proxy_list_lock, proxy.active_proxy_list_lock:
+				proxy.active_proxy_list = []
+				proxy.potential_proxy_list = []
+			continue
+		print("Unknown command: " + command[1])
+		continue
 		continue
 	print("Unknown command: " + command[0])
 
