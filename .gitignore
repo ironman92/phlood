@@ -1,2 +1,3 @@
 *.sublime*
 *.vs*
+__pycache__
