@@ -68,10 +68,11 @@ while True:
 	if command[0] == 'exit':
 		break
 	if command[0] == 'help':
-		print(	"Help   Display this help text\n" +
-				"Status Displays quick status\n" +
-				"Source Manage proxy sources\n" +
-				"Exit   Stops all threads and exits program\n")
+		print(	"Help     Display this help text\n" +
+				"Status   Displays quick status\n" +
+				"Source   Manage proxy sources\n" +
+				"Sample i Sample crential(s). Optionally add number to fetch that many samples\n" +
+				"Exit     Stops all threads and exits program\n")
 		continue
 	if command[0] == 'status':
 		print("IP: " + proxy.my_ip)
@@ -172,6 +173,19 @@ while True:
 			continue
 		print("Unknown command: " + command[1])
 		continue
+	if command[0] == 'sample':
+		size = 1
+		if len(command) > 1:
+			try:
+				size = int(command[1])
+			except:
+				print("Invalid input: " + command[1] + " must be an integer")
+				continue
+		for i in range(size):
+			sample = worker.worker.generate_credentials()
+			print("\nEmail:      " + sample[0])
+			print("Password:   " + sample[1])
+			print("User Agent: " + sample[2])
 		continue
 	print("Unknown command: " + command[0])
 
