@@ -60,15 +60,12 @@ while True:
 	if command[0] == 'exit':
 		break
 	if command[0] == 'help':
-		print(	"Available Commands:\n" +
-				"===================\n" +
-				"Help	Display this help text\n" +
-				"Status	Displays quick status\n" +
-				"Source	Manage proxy sources\n" +
-				"Exit	Stops all threads and exits program\n")
+		print(	"Help   Display this help text\n" +
+				"Status Displays quick status\n" +
+				"Source Manage proxy sources\n" +
+				"Exit   Stops all threads and exits program\n")
 		continue
 	if command[0] == 'status':
-		print("Status")
 		print("\tIP: " + proxy.my_ip)
 		print("\tProxies: " + str(len(proxy.list)))
 		with proxy.source_lock:
@@ -76,12 +73,10 @@ while True:
 		continue
 	if command[0] == 'source':
 		if len(command) < 2 or command[1] == 'help':
-			print(	"Source Information\n" +
-					"Options===========\n" +
-					"Help	Display this help text\n" +
-					"List	Lists all options\n" +
-					"Add	Add source ( interactive )\n" +
-					"Drop	Remove source")
+			print(	"Source Help        Display this help text\n" +
+					"Source List        Lists all options\n" +
+					"Source Add         Add source ( interactive )\n" +
+					"Source Drop url    Remove source")
 			continue
 		if command[1] == 'list':
 			with proxy.source_lock:
