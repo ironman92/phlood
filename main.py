@@ -44,8 +44,7 @@ worker.agents       = persistence['agents']
 
 
 proxy = proxy_list.proxy_list()
-for source in persistence['sources']:
-	proxy.add_source(source['url'], source['record'], source['ip'], source['port'], source['protocol'], source['protocol_dictionary'])
+proxy.source_list = persistence['sources']
 
 
 
