@@ -75,7 +75,7 @@ while True:
 			print(	"Source Help        Display this help text\n" +
 					"Source List        Lists all options\n" +
 					"Source Add         Add source ( interactive )\n" +
-					"Source Drop url    Remove source")
+					"Source Remove url  Remove source")
 			continue
 		if command[1] == 'list':
 			with proxy.source_lock:
@@ -100,6 +100,11 @@ while True:
 			confirm = input("Confirm Add of above information [Yes|No]: ")
 			if len(confirm) > 0 and confirm[0].lower() == 'y':
 				proxy.add_source(url, record, ip, port, protocol, protocol_dictionary)
+			continue
+		if command[1] == 'remove':
+			if len(command) < 3:
+				print("Missing url")
+			proxy.remove_source(command[2])
 			continue
 		print("Unknown command: " + command[1])
 		continue
