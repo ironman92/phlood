@@ -4,12 +4,10 @@ import time
 
 
 
-with open('names.txt', 'r') as name_list:
-	names = name_list.read().splitlines()
-with open('passwords.txt', 'r') as password_list:
-	passwords = password_list.read().splitlines()
-with open('domains.txt', 'r') as domain_list:
-	domains = domain_list.read().splitlines()
+names		= []
+passwords	= []
+domains		= []
+agents		= []
 
 
 

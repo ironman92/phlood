@@ -15,6 +15,9 @@ import argparse
 import time
 import proxy_list
 import random
+import os
+import json
+import worker
 
 
 
@@ -28,13 +31,21 @@ argument = parser.parse_args()
 
 
 
+# Load persistence
+persistence = {}
+if os.path.isfile('persistence.json'):
+	with open('persistence.json', 'r') as persist:
+		persistence = json.loads(persist.read())
+worker.names        = persistence['names']
+worker.passwords    = persistence['passwords']
+worker.domains      = persistence['domains']
+worker.agents       = persistence['agents']
+
+
+
 proxy = proxy_list.proxy_list()
-proxy.add_source("https://free-proxy-list.net",		"#proxylisttable tbody tr",	"td:nth-child(1)",	"td:nth-child(2)",	"td:nth-child(7)",	{'no':'http://','yes':'https://'}	)
-#proxy.add_source("https://us-proxy.org",			"",	"",	""	)
-#proxy.add_source("https://hidemy.name/proxy-list",	"",	"",	""	)
-#proxy.add_source("https://socks-proxy.net",			"",	"",	""	)
-#proxy.add_source("https://sslproxies.org",			"",	"",	""	)
-proxy.start()
+for source in persistence['sources']:
+	proxy.add_source(source['url'], source['record'], source['ip'], source['port'], source['protocol'], source['protocol_dictionary'])
 
 
 
@@ -99,3 +110,5 @@ while True:
 
 print("Exiting...")
 proxy.stop()
+with open('persistence.json', 'w') as persist:
+	json.dump(persistence, persist)
