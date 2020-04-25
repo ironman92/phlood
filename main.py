@@ -32,7 +32,14 @@ argument = parser.parse_args()
 
 
 # Load persistence
-persistence = {}
+persistence = {
+	'names': [],
+	'passwords': [],
+	'domains': [],
+	'agents': [],
+	'sources': [],
+	'proxies': []
+}
 if os.path.isfile('persistence.json'):
 	with open('persistence.json', 'r') as persist:
 		persistence = json.loads(persist.read())
