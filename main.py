@@ -82,6 +82,7 @@ while True:
 			with proxy.source_lock:
 				for source in proxy.source_list:
 					print(source['url'])
+			continue
 		if command[1] == 'add':
 			url					= input("URL: ").strip()
 			record				= input("CSS Record Selector: ").strip()
@@ -100,6 +101,9 @@ while True:
 			confirm = input("Confirm Add of above information [Yes|No]: ")
 			if len(confirm) > 0 and confirm[0].lower() == 'y':
 				proxy.add_source(url, record, ip, port, protocol, protocol_dictionary)
+			continue
+		print("Unknown command: " + command[1])
+		continue
 		continue
 	print("Unknown command: " + command[0])
 
