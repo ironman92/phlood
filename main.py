@@ -71,7 +71,8 @@ while True:
 		print("Status")
 		print("\tIP: " + proxy.my_ip)
 		print("\tProxies: " + str(len(proxy.list)))
-		print("\tProxy Sources: " + str(len(proxy.sources)))
+		with proxy.source_lock:
+			print("\tProxy Sources: " + str(len(proxy.source_list)))
 		continue
 	if command[0] == 'source':
 		if len(command) < 2 or command[1] == 'help':
@@ -83,8 +84,9 @@ while True:
 					"Drop	Remove source")
 			continue
 		if command[1] == 'list':
-			for source in proxy.sources:
-				print(source['url'])
+			with proxy.source_lock:
+				for source in proxy.source_list:
+					print(source['url'])
 		if command[1] == 'add':
 			url					= input("URL: ").strip()
 			record				= input("CSS Record Selector: ").strip()

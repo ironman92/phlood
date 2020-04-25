@@ -14,7 +14,7 @@ class proxy_list:
 		self.source_lock = threading.RLock()
 		self.stop_execution = True
 		self.list = []
-		self.sources = []
+		self.source_list = []
 		self.update_my_ip()
 		self.clean_list_thread = threading.Thread(target=self.run_clean_list)
 		self.proxy_add_thread = threading.Thread(target=self.run_proxy_add)
@@ -73,10 +73,10 @@ class proxy_list:
 		while not self.stop_execution:
 			time.sleep(0.01)
 			with self.source_lock:
-				if index >= len(self.sources):
+				if index >= len(self.source_list):
 					index = 0
 					continue
-				source = self.sources[index]
+				source = self.source_list[index]
 			index = index + 1
 			r = http.request('GET', source['url'])
 			if r.status != 200:
@@ -112,16 +112,16 @@ class proxy_list:
 			'protocol_dictionary':	protocol_dictionary
 		}
 		with self.source_lock:
-			if source in self.sources:
+			if source in self.source_list:
 				return False
-			self.sources.append(source)
+			self.source_list.append(source)
 			return True
 
 	def remove_source(self, url):
 		with self.source_lock:
-			for source in self.sources:
+			for source in self.source_list:
 				if source['url'] == url:
-					self.sources.remove(source)
+					self.source_list.remove(source)
 
 	def random(self):
 		with self.list_lock:
