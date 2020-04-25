@@ -74,10 +74,13 @@ while True:
 				"Exit   Stops all threads and exits program\n")
 		continue
 	if command[0] == 'status':
-		print("\tIP: " + proxy.my_ip)
-		print("\tProxies: " + str(len(proxy.active_proxy_list)))
+		print("IP: " + proxy.my_ip)
 		with proxy.source_lock:
-			print("\tProxy Sources: " + str(len(proxy.source_list)))
+			print("Proxy Sources:     " + str(len(proxy.source_list)))
+		with proxy.potential_proxy_list_lock:
+			print("Potential Proxies: " + str(len(proxy.potential_proxy_list)))
+		with proxy.active_proxy_list_lock:
+			print("Active Proxies:    " + str(len(proxy.active_proxy_list)))
 		continue
 	if command[0] == 'source':
 		if len(command) < 2 or command[1] == 'help':
