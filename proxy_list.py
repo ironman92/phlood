@@ -10,10 +10,10 @@ import time
 class proxy_list:
 	def __init__(self):
 		threading.Thread.__init__(self)
-		self.list_lock = threading.RLock()
+		self.active_proxy_list_lock = threading.RLock()
 		self.source_lock = threading.RLock()
 		self.stop_execution = True
-		self.list = []
+		self.active_proxy_list = []
 		self.source_list = []
 		self.update_my_ip()
 		self.clean_list_thread = threading.Thread(target=self.run_clean_list)
@@ -46,24 +46,24 @@ class proxy_list:
 		except:
 			proxy_valid = False
 		finally:
-			if address in self.list and not proxy_valid:
-				with self.list_lock:
-					self.list.remove(address)
-			if address not in self.list and proxy_valid:
-				with self.list_lock:
-					self.list.append(address)
+			if address in self.active_proxy_list and not proxy_valid:
+				with self.active_proxy_list_lock:
+					self.active_proxy_list.remove(address)
+			if address not in self.active_proxy_list and proxy_valid:
+				with self.active_proxy_list_lock:
+					self.active_proxy_list.append(address)
 		return proxy_valid
 
 	def run_clean_list(self):
 		index = 0
 		while not self.stop_execution:
 			time.sleep(0)
-			with self.list_lock:
-				if index >= len(self.list):
+			with self.active_proxy_list_lock:
+				if index >= len(self.active_proxy_list):
 					index = 0
 					time.sleep(1)
 					continue
-				record = self.list[index]
+				record = self.active_proxy_list[index]
 			if self.test_proxy(record):
 				index = index + 1
 
@@ -124,7 +124,7 @@ class proxy_list:
 					self.source_list.remove(source)
 
 	def random(self):
-		with self.list_lock:
-			if len(self.list) == 0:
+		with self.active_proxy_list_lock:
+			if len(self.active_proxy_list) == 0:
 				return None
-			return random.choice(self.list)
+			return random.choice(self.active_proxy_list)

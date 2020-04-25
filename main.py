@@ -66,7 +66,7 @@ while True:
 		continue
 	if command[0] == 'status':
 		print("\tIP: " + proxy.my_ip)
-		print("\tProxies: " + str(len(proxy.list)))
+		print("\tProxies: " + str(len(proxy.active_proxy_list)))
 		with proxy.source_lock:
 			print("\tProxy Sources: " + str(len(proxy.source_list)))
 		continue
