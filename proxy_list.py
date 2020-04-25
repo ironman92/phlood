@@ -10,33 +10,39 @@ import time
 class proxy_list:
 	def __init__(self):
 		threading.Thread.__init__(self)
+		self.potential_proxy_list_lock = threading.RLock()
 		self.active_proxy_list_lock = threading.RLock()
 		self.source_lock = threading.RLock()
+		self.my_ip_lock = threading.RLock()
 		self.stop_execution = True
+		self.potential_proxy_list = []
 		self.active_proxy_list = []
 		self.source_list = []
+		self.my_ip = None
+		self.my_ip_updated = 0
 		self.update_my_ip()
-		self.clean_list_thread = threading.Thread(target=self.run_clean_list)
 		self.proxy_add_thread = threading.Thread(target=self.run_proxy_add)
+		self.test_proxy_thread = threading.Thread(target=self.run_test_proxy)
 
 	def start(self):
 		self.stop_execution = False
 		self.proxy_add_thread.start()
-		self.clean_list_thread.start()
+		self.test_proxy_thread.start()
 
 	def stop(self):
 		self.stop_execution = True
-		self.clean_list_thread.join()
 		self.proxy_add_thread.join()
+		self.test_proxy_thread.join()
 
 	def update_my_ip(self):
-		http = urllib3.PoolManager(num_pools=1)
-		self.my_ip = json.loads(http.request('GET', 'http://httpbin.org/ip').data)['origin']
-		self.my_ip_updated = time.time()
+		with self.my_ip_lock:
+			if self.my_ip_updated + 60 < time.time():
+				http = urllib3.PoolManager(num_pools=1)
+				self.my_ip = json.loads(http.request('GET', 'http://httpbin.org/ip').data)['origin']
+				self.my_ip_updated = time.time()
 
-	def test_proxy(self, address):
-		if self.my_ip_updated + 60 < time.time():
-			self.update_my_ip()
+	def daemon_test_proxy(self, address):
+		self.update_my_ip()
 		proxy_valid = False
 		try:
 			proxy = urllib3.ProxyManager(address, num_pools=1)
@@ -46,36 +52,42 @@ class proxy_list:
 		except:
 			proxy_valid = False
 		finally:
-			if address in self.active_proxy_list and not proxy_valid:
-				with self.active_proxy_list_lock:
+			with self.active_proxy_list_lock:
+				if address in self.active_proxy_list and not proxy_valid:
 					self.active_proxy_list.remove(address)
-			if address not in self.active_proxy_list and proxy_valid:
-				with self.active_proxy_list_lock:
+				if address not in self.active_proxy_list and proxy_valid:
 					self.active_proxy_list.append(address)
 		return proxy_valid
 
-	def run_clean_list(self):
-		index = 0
+	def run_test_proxy(self):
+		heartbeat = 0
 		while not self.stop_execution:
-			time.sleep(0)
-			with self.active_proxy_list_lock:
-				if index >= len(self.active_proxy_list):
-					index = 0
-					time.sleep(1)
-					continue
-				record = self.active_proxy_list[index]
-			if self.test_proxy(record):
-				index = index + 1
+			time.sleep(0.1)
+			if heartbeat + 60 > time.time():
+				continue
+			heartbeat = time.time()
+			threads = []
+			with self.potential_proxy_list_lock:
+				for address in self.potential_proxy_list:
+					threads.append(threading.Thread(target=self.daemon_test_proxy, args=[address]))
+			for thread in threads:
+				thread.start()
+			for thread in threads:
+				thread.join()
 
 	def run_proxy_add(self):
 		http = urllib3.PoolManager(num_pools=1)
 		index = 0
+		heartbeat = 0
 		while not self.stop_execution:
 			time.sleep(0.01)
 			with self.source_lock:
 				if index >= len(self.source_list):
 					index = 0
 					continue
+				if index == 0 and heartbeat + 60 > time.time():
+					continue
+				heartbeat = time.time()
 				source = self.source_list[index]
 			index = index + 1
 			r = http.request('GET', source['url'])
@@ -100,7 +112,9 @@ class proxy_list:
 				address = address + record.select_one(source['ip']).text
 				if source['port']:
 					address = address + ':' + record.select_one(source['port']).text
-				self.test_proxy(address)
+				with self.potential_proxy_list_lock:
+					if address not in self.potential_proxy_list:
+						self.potential_proxy_list.append(address)
 
 	def add_source(self, url, record, ip, port='', protocol='', protocol_dictionary={}):
 		source = {

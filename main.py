@@ -45,6 +45,8 @@ worker.agents       = persistence['agents']
 
 proxy = proxy_list.proxy_list()
 proxy.source_list = persistence['sources']
+proxy.potential_proxy_list = persistence['proxies']
+proxy.start()
 
 
 
