@@ -40,7 +40,10 @@ class worker(threading.Thread):
 				start = random.randint(0, len(choice))
 				stop = random.randint(start, len(choice))
 				password = password + choice[start:stop]
-		return (email, password)
+		agent = random.choice(agents)
+		while agent['chance'] < random.randint(0, 1000)/10:
+			agent = random.choice(agents)
+		return (email, password, agent['agent'])
 
 	def __init__(self):
 		threading.Thread.__init__(self)
