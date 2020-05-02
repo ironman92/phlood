@@ -56,6 +56,8 @@ proxy.potential_proxy_list = persistence['proxies']
 proxy.start()
 
 
+worker_list = []
+
 
 print("Ready")
 while True:
@@ -74,7 +76,8 @@ while True:
 				"Status   Displays quick status\n" +
 				"Source   Manage proxy sources\n" +
 				"Proxy    Manage proxies\n" +
-				"Sample i Sample crential(s). Optionally add number to fetch that many samples\n" +
+				"worker	  Manage worker threads\n" +
+				"Sample n Sample crential(s). Optionally add number to fetch n samples\n" +
 				"Exit     Stops all threads and exits program")
 		continue
 
@@ -90,6 +93,7 @@ while True:
 		print("Passwords: " + str(len(persistence['passwords'])))
 		print("Domains:   " + str(len(persistence['domains'])))
 		print("Agents:    " + str(len(persistence['agents'])))
+		print("Workers:   " + str(len(worker_list)))
 		continue
 
 	if command[0] == 'source':
@@ -184,6 +188,30 @@ while True:
 		print("Unknown command: " + command[1])
 		continue
 
+	if command[0] == 'worker':
+		if len(command) < 2 or command[1] == 'help':
+			print(	"Worker Help	Display this help text\n" +
+					"Worker Start n	Starts n Worker threads\n" +
+					"Worker Kill n	Kills n Worker threads")
+			continue
+		if command[1] == 'start':
+			n = 1
+			if len(command) > 2:
+				n = int(command[2])
+			for i in range(n):
+				worker_list.append(worker.worker())
+			continue
+		if command[1] == 'kill':
+			n = 1
+			if len(command) > 2:
+				n = int(command[2])
+			while n > 0 and len(worker_list):
+				n = n - 1
+				worker_list.pop().stop()
+			continue
+		print("Unknown command " + command[1])
+		continue
+
 	if command[0] == 'sample':
 		size = 1
 		if len(command) > 1:
@@ -207,3 +235,5 @@ print("Exiting...")
 proxy.stop()
 with open('persistence.json', 'w') as persist:
 	json.dump(persistence, persist)
+while len(worker_list):
+	worker_list.pop().stop()

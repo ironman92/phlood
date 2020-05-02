@@ -47,6 +47,13 @@ class worker(threading.Thread):
 
 	def __init__(self):
 		threading.Thread.__init__(self)
+		self.stop_execution = False
+		self.start()
+
+	def stop(self):
+		self.stop_execution = True
+		self.join()
 
 	def run(self):
-		time.sleep(0)
+		while not self.stop_execution:
+			time.sleep(0.1)
