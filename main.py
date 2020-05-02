@@ -59,21 +59,25 @@ proxy.start()
 
 print("Ready")
 while True:
-	raw_command = input("\n>")
+	raw_command = input("\nPHlood>")
 	command = raw_command.split()
 	for i in range(len(command)):
 		command[i] = command[i].strip().lower()
 	if len(command) == 0:
 		continue
+
 	if command[0] == 'exit':
 		break
+
 	if command[0] == 'help':
 		print(	"Help     Display this help text\n" +
 				"Status   Displays quick status\n" +
 				"Source   Manage proxy sources\n" +
+				"Proxy    Manage proxies\n" +
 				"Sample i Sample crential(s). Optionally add number to fetch that many samples\n" +
-				"Exit     Stops all threads and exits program\n")
+				"Exit     Stops all threads and exits program")
 		continue
+
 	if command[0] == 'status':
 		print("IP: " + proxy.my_ip)
 		with proxy.source_lock:
@@ -82,7 +86,12 @@ while True:
 			print("Potential Proxies: " + str(len(proxy.potential_proxy_list)))
 		with proxy.active_proxy_list_lock:
 			print("Active Proxies:    " + str(len(proxy.active_proxy_list)))
+		print("Names:     " + str(len(persistence['names'])))
+		print("Passwords: " + str(len(persistence['passwords'])))
+		print("Domains:   " + str(len(persistence['domains'])))
+		print("Agents:    " + str(len(persistence['agents'])))
 		continue
+
 	if command[0] == 'source':
 		if len(command) < 2 or command[1] == 'help':
 			print(	"Source Help        Display this help text\n" +
@@ -121,6 +130,7 @@ while True:
 			continue
 		print("Unknown command: " + command[1])
 		continue
+
 	if command[0] == 'proxy':
 		if len(command) < 2 or command[1] == 'help':
 			print(	"Proxy Help         Display this help text\n" +
@@ -173,6 +183,7 @@ while True:
 			continue
 		print("Unknown command: " + command[1])
 		continue
+
 	if command[0] == 'sample':
 		size = 1
 		if len(command) > 1:
@@ -187,6 +198,7 @@ while True:
 			print("Password:   " + sample[1])
 			print("User Agent: " + sample[2])
 		continue
+
 	print("Unknown command: " + command[0])
 
 
