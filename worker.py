@@ -61,7 +61,6 @@ class worker(threading.Thread):
 
 	def run(self):
 		while not self.stop_execution:
-			print("\n\n\n")
 			proxy_info = None
 			try:
 				address = self.proxy_list.random()
