@@ -1,6 +1,7 @@
 import random
 import threading
 import time
+import urllib3
 
 
 
@@ -8,6 +9,9 @@ names		= []
 passwords	= []
 domains		= []
 agents		= []
+
+target = ''
+parameters = {"username":"","password":""}
 
 
 
@@ -45,9 +49,10 @@ class worker(threading.Thread):
 			agent = random.choice(agents)
 		return (email, password, agent['agent'])
 
-	def __init__(self):
+	def __init__(self, proxy_list):
 		threading.Thread.__init__(self)
 		self.stop_execution = False
+		self.proxy_list = proxy_list
 		self.start()
 
 	def stop(self):
@@ -56,4 +61,18 @@ class worker(threading.Thread):
 
 	def run(self):
 		while not self.stop_execution:
-			time.sleep(0.1)
+			print("\n\n\n")
+			proxy_info = None
+			try:
+				address = self.proxy_list.random()
+				credentials = worker.generate_credentials()
+				submission = {parameters["username"]:credentials[0],parameters["password"]:credentials[1]}
+				if address:
+					proxy = urllib3.ProxyManager(address, num_pools=1)
+					proxy_info = proxy.request('POST', target, fields=submission, timeout=15, retries=1)
+				else:
+					time.sleep(10)
+			except:
+				time.sleep(0.01)
+			finally:
+				time.sleep(0.01)

@@ -76,7 +76,7 @@ while True:
 				"Status   Displays quick status\n" +
 				"Source   Manage proxy sources\n" +
 				"Proxy    Manage proxies\n" +
-				"Worker	  Manage worker threads\n" +
+				"Worker   Manage worker threads\n" +
 				"Sample n Sample crential(s). Optionally add number to fetch n samples\n" +
 				"Exit     Stops all threads and exits program")
 		continue
@@ -190,16 +190,19 @@ while True:
 
 	if command[0] == 'worker':
 		if len(command) < 2 or command[1] == 'help':
-			print(	"Worker Help	Display this help text\n" +
-					"Worker Start n	Starts n Worker threads\n" +
-					"Worker Kill n	Kills n Worker threads")
+			print(	"Worker Help            Display this help text\n" +
+					"Worker Start n         Starts n Worker threads\n" +
+					"Worker Target xxx      Targets xxx page\n" +
+					"Worker Username xxx    Set name of field for username\n" +
+					"Worker Password xxx    Set name of field for password\n" +
+					"Worker Kill n          Kills n Worker threads")
 			continue
 		if command[1] == 'start':
 			n = 1
 			if len(command) > 2:
 				n = int(command[2])
 			for i in range(n):
-				worker_list.append(worker.worker())
+				worker_list.append(worker.worker(proxy))
 			continue
 		if command[1] == 'kill':
 			n = 1
@@ -208,6 +211,24 @@ while True:
 			while n > 0 and len(worker_list):
 				n = n - 1
 				worker_list.pop().stop()
+			continue
+		if command[1] == 'target':
+			if len(command) < 3:
+				print("Missing target")
+				continue
+			worker.target = command[2]
+			continue
+		if command[1] == 'username':
+			if len(command) < 3:
+				print("Missing username field name")
+				continue
+			worker.username = command[2]
+			continue
+		if command[1] == 'password':
+			if len(command) < 3:
+				print("Missing password field name")
+				continue
+			worker.password = command[2]
 			continue
 		print("Unknown command " + command[1])
 		continue
@@ -232,8 +253,8 @@ while True:
 
 
 print("Exiting...")
-proxy.stop()
-with open('persistence.json', 'w') as persist:
-	json.dump(persistence, persist)
 while len(worker_list):
 	worker_list.pop().stop()
+proxy.stop()
+#with open('persistence.json', 'w') as persist:
+#	json.dump(persistence, persist)
