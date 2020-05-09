@@ -61,19 +61,27 @@ class proxy_list:
 
 	def run_test_proxy(self):
 		heartbeat = 0
+		i_thread = 0
+		i_proxy = 0
+		threads = []
 		while not self.stop_execution:
 			time.sleep(0.1)
-			if heartbeat + 60 > time.time():
-				continue
 			heartbeat = time.time()
-			threads = []
 			with self.potential_proxy_list_lock:
-				for address in self.potential_proxy_list:
-					threads.append(threading.Thread(target=self.daemon_test_proxy, args=[address]))
-			for thread in threads:
-				thread.start()
-			for thread in threads:
-				thread.join()
+				if i_proxy >= len(self.potential_proxy_list):
+					i_proxy = 0
+				if i_proxy < len(self.potential_proxy_list) and len(threads) < 127:
+					t = threading.Thread(target=self.daemon_test_proxy, args=[self.potential_proxy_list[i_proxy]])
+					t.start()
+					threads.append(t)
+					i_proxy = i_proxy + 1
+			if i_thread >= len(threads):
+				i_thread = 0
+			if i_thread < len(threads):
+				if not threads[i_thread].is_alive():
+					threads[i_thread].join()
+					threads.remove(threads[i_thread])
+				i_thread = i_thread + 1
 
 	def run_proxy_add(self):
 		http = urllib3.PoolManager(num_pools=1)
