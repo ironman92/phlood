@@ -76,7 +76,7 @@ while True:
 				"Status   Displays quick status\n" +
 				"Source   Manage proxy sources\n" +
 				"Proxy    Manage proxies\n" +
-				"worker	  Manage worker threads\n" +
+				"Worker	  Manage worker threads\n" +
 				"Sample n Sample crential(s). Optionally add number to fetch n samples\n" +
 				"Exit     Stops all threads and exits program")
 		continue
